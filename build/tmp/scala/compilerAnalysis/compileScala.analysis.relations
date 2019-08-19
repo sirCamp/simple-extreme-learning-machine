@@ -1,0 +1,17 @@
+products:
+   src/main/scala/com/sircamp/elm/ExtremeLearningMachine.scala -> build/classes/scala/main/com/sircamp/elm/ExtremeLearningMachine.class
+   src/main/scala/com/sircamp/utils/Utils.scala -> build/classes/scala/main/com/sircamp/utils/Utils$.class
+   src/main/scala/com/sircamp/utils/Utils.scala -> build/classes/scala/main/com/sircamp/utils/Utils.class
+binary dependencies:
+   src/main/scala/com/sircamp/elm/ExtremeLearningMachine.scala -> /home/stefano/.gradle/caches/modules-2/files-2.1/org.scala-lang/scala-library/2.12.8/36b234834d8f842cdde963c8591efae6cf413e3f/scala-library-2.12.8.jar
+   src/main/scala/com/sircamp/elm/ExtremeLearningMachine.scala -> /home/stefano/.gradle/caches/modules-2/files-2.1/org.scalanlp/breeze_2.12/1.0/1833b50819d0df1e00cbc7a3fffae5dcf883b7cf/breeze_2.12-1.0.jar
+   src/main/scala/com/sircamp/elm/ExtremeLearningMachine.scala -> /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/rt.jar
+   src/main/scala/com/sircamp/utils/Utils.scala -> /home/stefano/.gradle/caches/modules-2/files-2.1/org.scala-lang/scala-library/2.12.8/36b234834d8f842cdde963c8591efae6cf413e3f/scala-library-2.12.8.jar
+   src/main/scala/com/sircamp/utils/Utils.scala -> /home/stefano/.gradle/caches/modules-2/files-2.1/org.scalanlp/breeze_2.12/1.0/1833b50819d0df1e00cbc7a3fffae5dcf883b7cf/breeze_2.12-1.0.jar
+   src/main/scala/com/sircamp/utils/Utils.scala -> /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/rt.jar
+source dependencies:
+external dependencies:
+class names:
+   src/main/scala/com/sircamp/elm/ExtremeLearningMachine.scala -> com.sircamp.elm.ExtremeLearningMachine
+   src/main/scala/com/sircamp/utils/Utils.scala -> com.sircamp.utils.Utils
+   src/main/scala/com/sircamp/utils/Utils.scala -> com.sircamp.utils.Utils$

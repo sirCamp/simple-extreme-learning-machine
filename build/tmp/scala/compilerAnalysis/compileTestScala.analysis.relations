@@ -1,0 +1,16 @@
+products:
+   src/test/scala/ExtremeLearningMachineSuite.scala -> build/classes/scala/test/ExtremeLearningMachineSuite.class
+binary dependencies:
+   src/test/scala/ExtremeLearningMachineSuite.scala -> /home/stefano/.gradle/caches/modules-2/files-2.1/junit/junit/4.12/2973d150c0dc1fefe998f834810d68f278ea58ec/junit-4.12.jar
+   src/test/scala/ExtremeLearningMachineSuite.scala -> /home/stefano/.gradle/caches/modules-2/files-2.1/org.scala-lang/scala-library/2.12.8/36b234834d8f842cdde963c8591efae6cf413e3f/scala-library-2.12.8.jar
+   src/test/scala/ExtremeLearningMachineSuite.scala -> /home/stefano/.gradle/caches/modules-2/files-2.1/org.scalactic/scalactic_2.12/3.0.0/881d0fd6785f4cebf9f6a1a02bf0525ee37eb4d0/scalactic_2.12-3.0.0.jar
+   src/test/scala/ExtremeLearningMachineSuite.scala -> /home/stefano/.gradle/caches/modules-2/files-2.1/org.scalanlp/breeze_2.12/1.0/1833b50819d0df1e00cbc7a3fffae5dcf883b7cf/breeze_2.12-1.0.jar
+   src/test/scala/ExtremeLearningMachineSuite.scala -> /home/stefano/.gradle/caches/modules-2/files-2.1/org.scalatest/scalatest_2.12/3.0.0/c4379449139ac787926b99b7c1a4de7037380410/scalatest_2.12-3.0.0.jar
+   src/test/scala/ExtremeLearningMachineSuite.scala -> build/classes/scala/main/com/sircamp/elm/ExtremeLearningMachine.class
+   src/test/scala/ExtremeLearningMachineSuite.scala -> build/classes/scala/main/com/sircamp/utils/Utils$.class
+   src/test/scala/ExtremeLearningMachineSuite.scala -> build/classes/scala/main/com/sircamp/utils/Utils.class
+   src/test/scala/ExtremeLearningMachineSuite.scala -> /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/rt.jar
+source dependencies:
+external dependencies:
+class names:
+   src/test/scala/ExtremeLearningMachineSuite.scala -> ExtremeLearningMachineSuite

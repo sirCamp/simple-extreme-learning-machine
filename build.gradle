@@ -1,0 +1,32 @@
+plugins {
+    id 'java'
+    id 'scala'
+}
+
+group 'com.sircamp'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+
+    log4jVersion = '1.2.17'
+    scalaBinaryVersion = '2.12'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile "org.scala-lang:scala-library:${scalaBinaryVersion}"
+    compile "org.scalanlp:breeze_${scalaBinaryVersion}:1.0"
+    compile "log4j:log4j:${log4jVersion}"
+    testCompile "junit:junit:4.12"
+    testCompile "org.scalatest:scalatest_${scalaBinaryVersion}:3.0.0"
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
