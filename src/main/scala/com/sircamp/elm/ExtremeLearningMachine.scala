@@ -1,7 +1,25 @@
 package com.sircamp.elm
 
+import java.io._
+import java.nio.file.{Files, Paths}
+
 import breeze.linalg.{DenseMatrix, DenseVector, argmax}
 import com.sircamp.utils.ActivationFunctions
+
+object ExtremeLearningMachine {
+
+  @throws(classOf[IOException])
+  @throws(classOf[ClassCastException])
+  def load(path:String): ExtremeLearningMachine = {
+
+    val bytes = Files.readAllBytes(Paths.get(path))
+    val ois = new ObjectInputStream(new ByteArrayInputStream(bytes))
+    val value = ois.readObject.asInstanceOf[ExtremeLearningMachine]
+    ois.close()
+    value
+  }
+
+}
 
 class ExtremeLearningMachine(val inputLength:Int, val hiddenUnits:Int) extends Serializable {
 
@@ -18,6 +36,21 @@ class ExtremeLearningMachine(val inputLength:Int, val hiddenUnits:Int) extends S
   def this(inputLength:Int) = {
     this(inputLength, inputLength)
 
+  }
+
+  @throws(classOf[IOException])
+  def save(path:String): Array[Byte] = {
+
+    val stream: ByteArrayOutputStream = new ByteArrayOutputStream()
+    val oos = new ObjectOutputStream(stream)
+    oos.writeObject(this)
+    stream.toByteArray
+
+    val filePath = Paths.get(path)
+    Files.write(filePath, stream.toByteArray)
+
+    oos.close()
+    stream.toByteArray
   }
 
   def getUsePseudoInverse: Boolean = this.usePseudoInverse
@@ -49,17 +82,6 @@ class ExtremeLearningMachine(val inputLength:Int, val hiddenUnits:Int) extends S
 
   }
 
-
-  def inputToHidden(x: DenseMatrix[Double]): DenseMatrix[Double] = {
-
-    // dot product in breeze
-    var weightedInput:DenseMatrix[Double] = x * weights
-
-    activationFunction(weightedInput)
-
-  }
-
-
   def fit(x: DenseMatrix[Double], y:DenseMatrix[Double]) : DenseMatrix[Double] = {
 
 
@@ -73,10 +95,10 @@ class ExtremeLearningMachine(val inputLength:Int, val hiddenUnits:Int) extends S
 
     val transposedHiddenData = hiddenData.t
 
-    //np.dot(np.linalg.inv(np.dot(Xt, X)), np.dot(Xt, y_train))
-    val leftOperand = usePseudoInverse match {
-      case true => breeze.linalg.pinv( transposedHiddenData * hiddenData )
-      case false => breeze.linalg.inv( transposedHiddenData * hiddenData )
+    val leftOperand = if (usePseudoInverse) {
+      breeze.linalg.pinv(transposedHiddenData * hiddenData)
+    } else {
+      breeze.linalg.inv(transposedHiddenData * hiddenData)
     }
 
     val rightOperand: DenseMatrix[Double] = transposedHiddenData * y
@@ -86,21 +108,20 @@ class ExtremeLearningMachine(val inputLength:Int, val hiddenUnits:Int) extends S
     weightedOutput
   }
 
-  def predict(x: DenseMatrix[Double]): DenseMatrix[Double] = {
+  def inputToHidden(x: DenseMatrix[Double]): DenseMatrix[Double] = {
 
-    val hiddenData = this.inputToHidden(x)
+    // dot product in breeze
+    val weightedInput:DenseMatrix[Double] = x * weights
 
-    val tmp =  hiddenData * weightedOutput
-
-    tmp
+    activationFunction(weightedInput)
 
   }
 
   def predictClasses(x: DenseMatrix[Double]):DenseVector[Int] = {
 
-    var rawPredictions = predict(x)
+    val rawPredictions = predict(x)
 
-    var predictions = DenseVector.zeros[Int](rawPredictions.rows)
+    val predictions = DenseVector.zeros[Int](rawPredictions.rows)
 
     for(j <- 0 until rawPredictions.rows){
 
@@ -112,5 +133,29 @@ class ExtremeLearningMachine(val inputLength:Int, val hiddenUnits:Int) extends S
     predictions
   }
 
+  def predict(x: DenseMatrix[Double]): DenseMatrix[Double] = {
+
+    if(weightedOutput == null){
+      throw new UnsupportedOperationException("Model mast be fit before to predict")
+    }
+    val hiddenData = this.inputToHidden(x)
+
+    hiddenData * weightedOutput
+
+  }
+
+  override def equals(other: Any): Boolean = other match {
+    case that: ExtremeLearningMachine =>
+      (that canEqual this) &&
+        weights.equals(that.weights) &&
+        weightedOutput.equals(that.weightedOutput) &&
+        classesNumber == that.classesNumber &&
+        usePseudoInverse == that.usePseudoInverse &&
+        inputLength == that.inputLength &&
+        hiddenUnits == that.hiddenUnits
+    case _ => false
+  }
+
+  def canEqual(other: Any): Boolean = other.isInstanceOf[ExtremeLearningMachine]
 
 }

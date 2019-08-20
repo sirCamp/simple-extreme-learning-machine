@@ -1,9 +1,11 @@
+import java.nio.file.{Files, Paths}
+
 import breeze.linalg.{DenseMatrix, DenseVector}
 import com.sircamp.elm.ExtremeLearningMachine
 import com.sircamp.utils.{ActivationFunctions, Metrics}
 import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
 import org.scalatest._
+import org.scalatest.junit.JUnitRunner
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
@@ -11,15 +13,19 @@ import scala.collection.mutable.ListBuffer
 @RunWith(classOf[JUnitRunner])
 class ExtremeLearningMachineSuite extends FunSuite with BeforeAndAfterAll with Matchers {
 
+  val filePath = "src/test/resources/elmSaved.model"
+
+
   var y : DenseMatrix[Double] = _
+
+  var X : DenseMatrix[Double] = _
+
+  var yPlain : DenseVector[Int] = _
+
 
   var yTrain : DenseMatrix[Double] = _
 
   var yTest : DenseMatrix[Double] = _
-
-  var yPlain : DenseVector[Int] = _
-
-  var X : DenseMatrix[Double] = _
 
   var XTrain : DenseMatrix[Double] = _
 
@@ -33,7 +39,7 @@ class ExtremeLearningMachineSuite extends FunSuite with BeforeAndAfterAll with M
     val bufferedSource = io.Source.fromFile("src/test/resources/data.csv")
 
     val yBuffer = new ListBuffer[Double]()
-    val Xbuffer = new ListBuffer[Double]()
+    val XBuffer = new ListBuffer[Double]()
     val columnLength = 20
 
 
@@ -48,7 +54,7 @@ class ExtremeLearningMachineSuite extends FunSuite with BeforeAndAfterAll with M
 
         yBuffer += String.valueOf(cols(0)).toDouble
         for(i <- 1 until cols.length){
-          Xbuffer += String.valueOf(cols(i)).toDouble
+          XBuffer += String.valueOf(cols(i)).toDouble
         }
 
       }
@@ -71,26 +77,33 @@ class ExtremeLearningMachineSuite extends FunSuite with BeforeAndAfterAll with M
 
     val yList: List[Array[Double]] = yBuffer.result().map(elm => {
 
-      var arr = Array.fill(n=classesNumber){0.0}
-      arr(mapping.get(elm).get) = 1
+      val arr = Array.fill(n=classesNumber){0.0}
+      arr(mapping(elm)) = 1
 
       arr
     })
 
     DenseMatrix.zeros[Double](yBuffer.length, classesNumber)
-    val flat = yList.toArray.flatten
+
     y = new DenseMatrix[Double](yBuffer.length, classesNumber, yList.toArray.flatten, 0, 2, true)
-    X = new DenseMatrix[Double](yBuffer.length, columnLength, Xbuffer.toArray, 0, columnLength,true)
+    X = new DenseMatrix[Double](yBuffer.length, columnLength, XBuffer.toArray, 0, columnLength,true)
 
     yTrain = y(0 until 90, ::)
     yTest = y(90 until 100, ::)
-
 
     XTrain = X(0 until 90, ::)
     XTest = X(90 until 100, ::)
 
   }
 
+  override protected def afterAll(): Unit = {
+
+    super.afterAll()
+    if(Files.exists(Paths.get(filePath))){
+      Files.delete(Paths.get(filePath))
+    }
+
+  }
 
   test("Test simple constructor") {
 
@@ -171,14 +184,57 @@ class ExtremeLearningMachineSuite extends FunSuite with BeforeAndAfterAll with M
 
     elm.fit(XTrain, yTrain)
 
-    var yPred = elm.predictClasses(XTest)
+    val yPred = elm.predictClasses(XTest)
 
-    println("Accuracy: "+Metrics.accuracy_score(yPlain,yPred))
+    val accuracy = Metrics.accuracyScore(yPlain,yPred)
+    println("Accuracy: "+accuracy)
 
-    assert(1.0 == Metrics.accuracy_score(yPlain,yPred))
+    assert(1.0 == accuracy)
 
   }
 
+  test("Test save model") {
+
+    val elm = new ExtremeLearningMachine(X.cols, X.cols)
+    elm.initializeWeights()
+
+    elm.setActivationFunction(ActivationFunctions.hardSigmoid)
+
+    elm.setUsePseudoInverse(true)
+
+    elm.fit(XTrain, yTrain)
+
+    val bytes = elm.save(filePath)
+
+    var assertions = new ListBuffer[Assertion]()
+
+    assertions += assert(Files.exists(Paths.get(filePath)))
+    assertions += Files.readAllBytes(Paths.get(filePath)) should contain theSameElementsAs bytes
+
+    assertions.forall(_ == Succeeded)
+
+  }
+
+
+  test("Test load model") {
+
+
+    val elm = new ExtremeLearningMachine(X.cols, X.cols)
+    elm.initializeWeights()
+
+    elm.setActivationFunction(ActivationFunctions.hardSigmoid)
+
+    elm.setUsePseudoInverse(true)
+
+    elm.fit(XTrain, yTrain)
+
+    elm.save(filePath)
+
+    val loadedModel = ExtremeLearningMachine.load(filePath)
+
+    assert(elm.equals(loadedModel))
+
+  }
 
   test("Test predict classes with leakyRelu activation function") {
 
@@ -189,14 +245,14 @@ class ExtremeLearningMachineSuite extends FunSuite with BeforeAndAfterAll with M
 
     elm.fit(XTrain, yTrain)
 
-    var yPred = elm.predictClasses(XTest)
+    val yPred = elm.predictClasses(XTest)
 
-    println("Accuracy: "+Metrics.accuracy_score(yPlain,yPred))
+    val accuracy = Metrics.accuracyScore(yPlain,yPred)
+    println("Accuracy: "+accuracy)
 
-    assert(1.0 == Metrics.accuracy_score(yPlain,yPred))
+    assert(1.0 == accuracy)
 
   }
-
 
   test("Test predict classes with elu activation function") {
 
@@ -207,14 +263,14 @@ class ExtremeLearningMachineSuite extends FunSuite with BeforeAndAfterAll with M
 
     elm.fit(XTrain, yTrain)
 
-    var yPred = elm.predictClasses(XTest)
+    val yPred = elm.predictClasses(XTest)
 
-    println("Accuracy: "+Metrics.accuracy_score(yPlain,yPred))
+    val accuracy = Metrics.accuracyScore(yPlain,yPred)
+    println("Accuracy: "+accuracy)
 
-    assert(1.0 == Metrics.accuracy_score(yPlain,yPred))
+    assert(1.0 == accuracy)
 
   }
-
 
   test("Test predict classes with sigmoid activation function") {
 
@@ -225,14 +281,14 @@ class ExtremeLearningMachineSuite extends FunSuite with BeforeAndAfterAll with M
 
     elm.fit(XTrain, yTrain)
 
-    var yPred = elm.predictClasses(XTest)
+    val yPred = elm.predictClasses(XTest)
 
-    println("Accuracy: "+Metrics.accuracy_score(yPlain,yPred))
+    val accuracy = Metrics.accuracyScore(yPlain,yPred)
+    println("Accuracy: "+accuracy)
 
-    assert(1.0 == Metrics.accuracy_score(yPlain,yPred))
+    assert(accuracy <= 1.0)
 
   }
-
 
   test("Test predict classes with hardSigmoid activation function") {
 
@@ -245,14 +301,14 @@ class ExtremeLearningMachineSuite extends FunSuite with BeforeAndAfterAll with M
 
     elm.fit(XTrain, yTrain)
 
-    var yPred = elm.predictClasses(XTest)
+    val yPred = elm.predictClasses(XTest)
 
-    println("Accuracy: "+Metrics.accuracy_score(yPlain,yPred))
+    val accuracy = Metrics.accuracyScore(yPlain,yPred)
+    println("Accuracy: "+accuracy)
 
-    assert(0.0 == Metrics.accuracy_score(yPlain,yPred) || 1.0 == Metrics.accuracy_score(yPlain,yPred))
+    assert(accuracy <= 1.0)
 
   }
-
 
   test("Test predict classes with exponential activation function") {
 
@@ -263,11 +319,12 @@ class ExtremeLearningMachineSuite extends FunSuite with BeforeAndAfterAll with M
 
     elm.fit(XTrain, yTrain)
 
-    var yPred = elm.predictClasses(XTest)
+    val yPred = elm.predictClasses(XTest)
 
-    println("Accuracy: "+Metrics.accuracy_score(yPlain,yPred))
+    val accuracy = Metrics.accuracyScore(yPlain,yPred)
+    println("Accuracy: "+accuracy)
 
-    assert(0.0 == Metrics.accuracy_score(yPlain,yPred))
+    assert(accuracy <= 1.0)
 
   }
 
@@ -280,14 +337,14 @@ class ExtremeLearningMachineSuite extends FunSuite with BeforeAndAfterAll with M
 
     elm.fit(XTrain, yTrain)
 
-    var yPred = elm.predictClasses(XTest)
+    val yPred = elm.predictClasses(XTest)
 
-    println("Accuracy: "+Metrics.accuracy_score(yPlain,yPred))
+    val accuracy = Metrics.accuracyScore(yPlain,yPred)
+    println("Accuracy: "+accuracy)
 
-    assert(1.0 == Metrics.accuracy_score(yPlain,yPred))
+    assert(accuracy <= 1.0)
 
   }
-
 
 
   test("Test predict classes with softPlus activation function") {
@@ -299,15 +356,14 @@ class ExtremeLearningMachineSuite extends FunSuite with BeforeAndAfterAll with M
 
     elm.fit(XTrain, yTrain)
 
-    var yPred = elm.predictClasses(XTest)
+    val yPred = elm.predictClasses(XTest)
 
-    println("Accuracy: "+Metrics.accuracy_score(yPlain,yPred))
+    val accuracy = Metrics.accuracyScore(yPlain,yPred)
+    println("Accuracy: "+accuracy)
 
-    assert(1.0 == Metrics.accuracy_score(yPlain,yPred))
+    assert(accuracy <= 1.0)
 
   }
-
-
 
   test("Test predict classes with softSign activation function") {
 
@@ -318,15 +374,15 @@ class ExtremeLearningMachineSuite extends FunSuite with BeforeAndAfterAll with M
 
     elm.fit(XTrain, yTrain)
 
-    var yPred = elm.predictClasses(XTest)
+    val yPred = elm.predictClasses(XTest)
 
-    println("Accuracy: "+Metrics.accuracy_score(yPlain,yPred))
+    val accuracy = Metrics.accuracyScore(yPlain,yPred)
 
-    assert(1.0 == Metrics.accuracy_score(yPlain,yPred))
+    println("Accuracy: "+accuracy)
+
+    assert(accuracy <= 1.0)
 
   }
-
-
 
 
 }
