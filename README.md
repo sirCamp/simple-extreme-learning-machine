@@ -7,11 +7,7 @@
 
 This is a simple scala & Breeze implementation of an Extreme Learning Machine.
 
-It's based on Breeze, a library designed to perform with scientific computation, in order to have great performances thanks to the linear algebra optimizations and to the usage of BLAS.
-
-For further information take a look to Breeze github page: [https://github.com/scalanlp/breeze/wiki](https://github.com/scalanlp/breeze/wiki) 
-
-I suggest also to take a look to linear algebra concepts page: [https://github.com/scalanlp/breeze/wiki/Breeze-Linear-Algebra](https://github.com/scalanlp/breeze/wiki/Breeze-Linear-Algebra)
+This library is designed to have great performances in scientific computation thanks to the linear algebra optimizations.
 
 
 ### How to
