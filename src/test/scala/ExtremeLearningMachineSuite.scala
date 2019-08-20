@@ -3,7 +3,7 @@ import java.nio.file.{Files, Paths}
 import breeze.linalg
 import breeze.linalg.{DenseMatrix, DenseVector}
 import com.sircamp.elm.ExtremeLearningMachine
-import com.sircamp.utils.Metrics
+import com.sircamp.utils.{ActivationFunctions, Metrics}
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.{Assertion, BeforeAndAfterAll, FunSuite, Matchers, Succeeded}
@@ -94,15 +94,6 @@ class ExtremeLearningMachineSuite extends FunSuite with BeforeAndAfterAll with M
 
   }
 
-  /*override protected def afterAll(): Unit = {
-    try {
-
-
-    } finally {
-      super.afterAll()
-    }
-  }*/
-
 
   test("Test simple constructor") {
 
@@ -119,15 +110,11 @@ class ExtremeLearningMachineSuite extends FunSuite with BeforeAndAfterAll with M
 
   }
 
-  test("Test inputLenght constructor") {
+  test("Test inputLength constructor") {
 
     val elm = new ExtremeLearningMachine(X.cols)
 
-    var assertionList = ListBuffer[Assertion]()
-
     assert(elm.inputLength == X.cols)
-
-
 
   }
 
@@ -180,7 +167,6 @@ class ExtremeLearningMachineSuite extends FunSuite with BeforeAndAfterAll with M
 
   }
 
-
   test("Test predict classes") {
 
     val elm = new ExtremeLearningMachine(X.cols, X.cols)
@@ -190,10 +176,160 @@ class ExtremeLearningMachineSuite extends FunSuite with BeforeAndAfterAll with M
 
     var yPred = elm.predictClasses(XTest)
 
-    println(Metrics.accuracy_score(yPlain,yPred))
+    println("Accuracy: "+Metrics.accuracy_score(yPlain,yPred))
 
-    assert(elm.getWeights != null)
+    assert(1.0 == Metrics.accuracy_score(yPlain,yPred))
 
   }
+
+
+  test("Test predict classes with leakyRelu activation function") {
+
+    val elm = new ExtremeLearningMachine(X.cols, X.cols)
+    elm.initializeWeights()
+
+    elm.setActivationFunction(ActivationFunctions.leakyReLu(0.1d))
+
+    elm.fit(XTrain, yTrain)
+
+    var yPred = elm.predictClasses(XTest)
+
+    println("Accuracy: "+Metrics.accuracy_score(yPlain,yPred))
+
+    assert(1.0 == Metrics.accuracy_score(yPlain,yPred))
+
+  }
+
+
+  test("Test predict classes with elu activation function") {
+
+    val elm = new ExtremeLearningMachine(X.cols, X.cols)
+    elm.initializeWeights()
+
+    elm.setActivationFunction(ActivationFunctions.elu(0.1d))
+
+    elm.fit(XTrain, yTrain)
+
+    var yPred = elm.predictClasses(XTest)
+
+    println("Accuracy: "+Metrics.accuracy_score(yPlain,yPred))
+
+    assert(1.0 == Metrics.accuracy_score(yPlain,yPred))
+
+  }
+
+
+  test("Test predict classes with sigmoid activation function") {
+
+    val elm = new ExtremeLearningMachine(X.cols, X.cols)
+    elm.initializeWeights()
+
+    elm.setActivationFunction(ActivationFunctions.sigmoid)
+
+    elm.fit(XTrain, yTrain)
+
+    var yPred = elm.predictClasses(XTest)
+
+    println("Accuracy: "+Metrics.accuracy_score(yPlain,yPred))
+
+    assert(1.0 == Metrics.accuracy_score(yPlain,yPred))
+
+  }
+
+
+  test("Test predict classes with hardSigmoid activation function") {
+
+    val elm = new ExtremeLearningMachine(X.cols, X.cols)
+    elm.initializeWeights()
+
+    elm.setActivationFunction(ActivationFunctions.hardSigmoid)
+
+    elm.setUsePseudoInverse(true)
+
+    elm.fit(XTrain, yTrain)
+
+    var yPred = elm.predictClasses(XTest)
+
+    println("Accuracy: "+Metrics.accuracy_score(yPlain,yPred))
+
+    assert(1.0 == Metrics.accuracy_score(yPlain,yPred))
+
+  }
+
+
+  test("Test predict classes with exponential activation function") {
+
+    val elm = new ExtremeLearningMachine(X.cols, X.cols)
+    elm.initializeWeights()
+
+    elm.setActivationFunction(ActivationFunctions.exponential)
+
+    elm.fit(XTrain, yTrain)
+
+    var yPred = elm.predictClasses(XTest)
+
+    println("Accuracy: "+Metrics.accuracy_score(yPlain,yPred))
+
+    assert(0.0 == Metrics.accuracy_score(yPlain,yPred))
+
+  }
+
+  test("Test predict classes with tanh activation function") {
+
+    val elm = new ExtremeLearningMachine(X.cols, X.cols)
+    elm.initializeWeights()
+
+    elm.setActivationFunction(ActivationFunctions.tanh)
+
+    elm.fit(XTrain, yTrain)
+
+    var yPred = elm.predictClasses(XTest)
+
+    println("Accuracy: "+Metrics.accuracy_score(yPlain,yPred))
+
+    assert(1.0 == Metrics.accuracy_score(yPlain,yPred))
+
+  }
+
+
+
+  test("Test predict classes with softPlus activation function") {
+
+    val elm = new ExtremeLearningMachine(X.cols, X.cols)
+    elm.initializeWeights()
+
+    elm.setActivationFunction(ActivationFunctions.softPlus)
+
+    elm.fit(XTrain, yTrain)
+
+    var yPred = elm.predictClasses(XTest)
+
+    println("Accuracy: "+Metrics.accuracy_score(yPlain,yPred))
+
+    assert(1.0 == Metrics.accuracy_score(yPlain,yPred))
+
+  }
+
+
+
+  test("Test predict classes with softSign activation function") {
+
+    val elm = new ExtremeLearningMachine(X.cols, X.cols)
+    elm.initializeWeights()
+
+    elm.setActivationFunction(ActivationFunctions.softSign)
+
+    elm.fit(XTrain, yTrain)
+
+    var yPred = elm.predictClasses(XTest)
+
+    println("Accuracy: "+Metrics.accuracy_score(yPlain,yPred))
+
+    assert(1.0 == Metrics.accuracy_score(yPlain,yPred))
+
+  }
+
+
+
 
 }

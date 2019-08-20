@@ -1,29 +1,9 @@
 package com.sircamp.elm
 
 import breeze.linalg.{DenseMatrix, DenseVector, argmax}
-
-object ExtremeLearningMachine {
-
-  final val SIGMOID = "sigmoid"
-  final val HARD_SIGMOID = "hardSigmoid"
-  final val TANH = "tanh"
-  final val RELU = "relu"
-  final val LEAKY_RELU = "leakyRelu"
-  final val EXPONENTIAL = "exponential"
-  final val ELU = "elu"
-  final val SOFT_PLUS = "softPlus"
-  final val SOFT_SIGN = "softSign"
-
-  final val availableActivationFunction = Seq(SIGMOID,HARD_SIGMOID,TANH,RELU,LEAKY_RELU,EXPONENTIAL,ELU,SOFT_PLUS,SOFT_SIGN)
-
-
-}
-
+import com.sircamp.utils.ActivationFunctions
 
 class ExtremeLearningMachine(val inputLength:Int, val hiddenUnits:Int) extends Serializable {
-
-
-
 
   private var weights: DenseMatrix[Double] = _
 
@@ -31,25 +11,27 @@ class ExtremeLearningMachine(val inputLength:Int, val hiddenUnits:Int) extends S
 
   private var classesNumber:Int = _
 
-  private var activationFunction:String = ExtremeLearningMachine.RELU
-  
+  private var activationFunction:DenseMatrix[Double] => DenseMatrix[Double] = ActivationFunctions.relu
+
+  private var usePseudoInverse = false
 
   def this(inputLength:Int) = {
     this(inputLength, inputLength)
 
   }
 
+  def getUsePseudoInverse: Boolean = this.usePseudoInverse
 
-  def getActivationFunction: String = this.activationFunction
+  def setUsePseudoInverse(usePseudoInverse:Boolean):Unit = {
 
-  def setActivationFunction(activationFunction:String):Unit = {
-    if(ExtremeLearningMachine.availableActivationFunction.contains(activationFunction)){
-      this.activationFunction = activationFunction
-    }
-    else{
-      throw new Exception("Non valid activation function")
-    }
+    this.usePseudoInverse = usePseudoInverse
+  }
 
+  def getActivationFunction: DenseMatrix[Double] => DenseMatrix[Double] = this.activationFunction
+
+  def setActivationFunction(activationFunction:DenseMatrix[Double] => DenseMatrix[Double]):Unit = {
+
+    this.activationFunction = activationFunction
   }
 
   def getWeights: DenseMatrix[Double] = this.weights
@@ -73,17 +55,7 @@ class ExtremeLearningMachine(val inputLength:Int, val hiddenUnits:Int) extends S
     // dot product in breeze
     var weightedInput:DenseMatrix[Double] = x * weights
 
-    weightedInput.map(element => {
-
-      var res:Double = 0
-      if(element > 0){
-        res = element
-      }
-
-      res
-
-    })
-
+    activationFunction(weightedInput)
 
   }
 
@@ -102,7 +74,11 @@ class ExtremeLearningMachine(val inputLength:Int, val hiddenUnits:Int) extends S
     val transposedHiddenData = hiddenData.t
 
     //np.dot(np.linalg.inv(np.dot(Xt, X)), np.dot(Xt, y_train))
-    val leftOperand: DenseMatrix[Double] = breeze.linalg.inv( transposedHiddenData * hiddenData )
+    val leftOperand = usePseudoInverse match {
+      case true => breeze.linalg.pinv( transposedHiddenData * hiddenData )
+      case false => breeze.linalg.inv( transposedHiddenData * hiddenData )
+    }
+
     val rightOperand: DenseMatrix[Double] = transposedHiddenData * y
 
     weightedOutput = leftOperand * rightOperand

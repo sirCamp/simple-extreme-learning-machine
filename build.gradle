@@ -25,6 +25,7 @@ repositories {
 dependencies {
     compile "org.scala-lang:scala-library:${scalaBinaryVersion}"
     compile "org.scalanlp:breeze_${scalaBinaryVersion}:1.0"
+    compile "org.scalanlp:breeze-natives_${scalaBinaryVersion}:1.0"
     compile "log4j:log4j:${log4jVersion}"
     testCompile "junit:junit:4.12"
     testCompile "org.scalatest:scalatest_${scalaBinaryVersion}:3.0.0"

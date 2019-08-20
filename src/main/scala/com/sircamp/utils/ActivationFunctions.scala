@@ -5,7 +5,7 @@ import breeze.numerics.{abs, exp, log}
 
 object ActivationFunctions {
 
-  def linear(matrix: DenseMatrix[Double]):DenseMatrix[Double] = {
+  val linear: DenseMatrix[Double] => DenseMatrix[Double] = (matrix: DenseMatrix[Double]) => {
 
     matrix.map(element => {
 
@@ -14,7 +14,7 @@ object ActivationFunctions {
     })
   }
 
-  def sigmoid(matrix: DenseMatrix[Double]):DenseMatrix[Double] = {
+  val sigmoid: DenseMatrix[Double] => DenseMatrix[Double] = (matrix: DenseMatrix[Double]) => {
 
     matrix.map(element => {
 
@@ -26,7 +26,7 @@ object ActivationFunctions {
   }
 
 
-  def hardSigmoid(matrix: DenseMatrix[Double]):DenseMatrix[Double] = {
+  val hardSigmoid: DenseMatrix[Double] => DenseMatrix[Double] = (matrix: DenseMatrix[Double]) => {
 
 
       matrix.map(element => {
@@ -48,7 +48,7 @@ object ActivationFunctions {
       })
   }
 
-  def exponential(matrix: DenseMatrix[Double]):DenseMatrix[Double] = {
+  val exponential: DenseMatrix[Double] => DenseMatrix[Double] = (matrix: DenseMatrix[Double]) => {
 
 
     matrix.map(element => {
@@ -57,7 +57,7 @@ object ActivationFunctions {
     })
   }
 
-  def tanh(matrix: DenseMatrix[Double]): DenseMatrix[Double] = {
+  val tanh: DenseMatrix[Double] => DenseMatrix[Double] = (matrix: DenseMatrix[Double]) => {
 
 
     matrix.map(element => {
@@ -67,7 +67,7 @@ object ActivationFunctions {
 
   }
 
-  def softPlus(matrix: DenseMatrix[Double]): DenseMatrix[Double] = {
+  val softPlus: DenseMatrix[Double] => DenseMatrix[Double] = (matrix: DenseMatrix[Double]) => {
 
     matrix.map(element => {
       log(exp(element) +1 )
@@ -75,7 +75,7 @@ object ActivationFunctions {
   }
 
 
-  def softSign(matrix: DenseMatrix[Double]): DenseMatrix[Double] = {
+  val softSign: DenseMatrix[Double] => DenseMatrix[Double] = (matrix: DenseMatrix[Double]) =>{
 
     matrix.map(element => {
       element / (abs(element) +1 )
@@ -83,7 +83,7 @@ object ActivationFunctions {
 
   }
 
-  def relu(matrix: DenseMatrix[Double]):DenseMatrix[Double] = {
+  val relu: DenseMatrix[Double] => DenseMatrix[Double] = (matrix: DenseMatrix[Double]) => {
 
     matrix.map(element => {
 
@@ -97,41 +97,42 @@ object ActivationFunctions {
     })
   }
 
-  def leakyReLu(matrix: DenseMatrix[Double], alpha:Double = 0.1d):DenseMatrix[Double] = {
+  val leakyReLu: Double => DenseMatrix[Double] => DenseMatrix[Double] = (alpha:Double) => {
 
-    matrix.map(element => {
+    (matrix: DenseMatrix[Double]) => {
+      matrix.map(element => {
 
-      var res: Double = 0
-      if (element >= 0) {
-        res = element
-      }
-      else{
-        res = alpha * element
-      }
+        var res: Double = 0
+        if (element >= 0) {
+          res = element
+        }
+        else {
+          res = alpha * element
+        }
 
-      res
+        res
 
-    })
+      })
+    }
   }
 
 
-  def elu(matrix: DenseMatrix[Double], alpha:Double = 0.1d):DenseMatrix[Double] = {
+  val elu: Double => DenseMatrix[Double] => DenseMatrix[Double] = (alpha:Double) => {
+    (matrix: DenseMatrix[Double]) => {
+      matrix.map(element => {
 
-    matrix.map(element => {
+        var res: Double = 0
+        if (element >= 0) {
+          res = element
+        }
+        else {
+          res = alpha * (exp(element) - 1)
+        }
 
-      var res: Double = 0
-      if (element >= 0) {
-        res = element
-      }
-      else{
-        res = alpha * (exp(element)-1)
-      }
+        res
 
-      res
-
-    })
+      })
+    }
   }
-
-
 
 }
