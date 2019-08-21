@@ -5,6 +5,18 @@ import breeze.linalg.{DenseVector, sum}
 
 object Metrics {
 
+  private val reduceFunction = (el1:Int, el2:Int) => {
+    el1 + el2
+  }
+
+  private val mapFunction = (el:Int) => {
+    if(el != 0){
+      1
+    }
+    else{
+      el
+    }
+  }
 
   @throws(classOf[IllegalArgumentException])
   def accuracyScore(yTrue:DenseVector[Int], yPred:DenseVector[Int]): Double = {
@@ -57,9 +69,10 @@ object Metrics {
 
     val trueAndPredicted:DenseVector[Int] = yTrue * yPred
 
-    val truePositive:Int  = trueAndPredicted.map( el => {if (el == 0) 0 else 1}).reduce((el1, el2) => {el1+el2})
-    val yPredictedSum:Int  = yTrue.map( el => {if (el == 0) 0 else 1}).reduce((el1, el2) => {el1+el2})
-    val yTrueSum:Int  = yPred.map( el => {if (el == 0) 0 else 1}).reduce((el1, el2) => {el1+el2})
+
+    val truePositive:Int  = trueAndPredicted.map( mapFunction ).reduce( reduceFunction )
+    val yPredictedSum:Int  = yTrue.map( mapFunction ).reduce( reduceFunction )
+    val yTrueSum:Int  = yPred.map( mapFunction ).reduce( reduceFunction )
 
     val falsePositive = yPredictedSum - truePositive
     val falseNegative = yTrueSum - truePositive

@@ -28,6 +28,7 @@ class MetricsSuite extends FunSuite with BeforeAndAfterAll with Matchers with Pr
 
     yPredExcept = new DenseVector[Int](yPredExceptArray)
     yTrueExcept = new DenseVector[Int](yTrueExceptArray)
+
   }
 
   test("Test accuracyScore"){
